@@ -2,11 +2,5 @@
   <span class="logo"/>
   <h3>{{setting "name"}}</h3>
 </header>
-<button class="makeusers">Draw!</button>
-
+<input class="btn build" type="button" value="Build CSV"/>
 <section data-main/>
-<footer>
-  <a href="mailto:{{author.email}}">
-    {{author.name}}
-  </a>
-</footer>

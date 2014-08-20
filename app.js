@@ -14,32 +14,30 @@
     },
 
     events: {
-      'app.activated':'fetchAllUsers',
-      'click .makeusers': 'buildList'
+      'click .build': 'init'
 
+    },
+
+    init: function() {
+      this.switchTo('loading');
+      this.fetchAllUsers();
     },
 
     buildList: function() { // Parse results of users in the account
 
       var data = this.users;
 
-      var suspendedUsers = _.filter(data, function(user){
+      var suspendedUsers = _.filter(data, function(user){ // Filter results of all users down to just suspended users
         return user.suspended === true;
       });
 
       console.log(suspendedUsers);
 
       this.switchTo('draw', {
-        users: this.suspendedUsersObject
+        users: suspendedUsers
       });
 
     },
-
-    // drawList: function() {
-    //   this.switchTo('draw', {
-    //     users: this.users
-    //   });
-    // },
 
     fetchAllUsers: function() {
 
@@ -58,6 +56,7 @@
             .done(_.bind(
               function(data) {
                 this.users = data;
+                this.buildList();
                 done();
               }, this))
             .fail(_.bind(function() {
