@@ -12,26 +12,22 @@
         };
       }
     },
-    
+
     events: {
       'app.activated':'fetchAllUsers',
       'click .makeusers': 'buildList'
 
     },
-    
+
     buildList: function() { // Parse results of users in the account
 
-      var suspendedUsersObject = {};
       var data = this.users;
 
-      for (var i = 0; data.users.length > i; i++) { // Loop through all results of users
-       
-       if (data.users[i].suspended === true) { // If the user is suspended then add their id, name, and email to the new array of user objects
-        // console.log("User ID = " + data.users[i].id + " | NAME = " + data.users[i].name + " | EMAIL = " + data.users[i].email);
-        // BUILD NEW USER OBJECT FOR SUSPENDED USER HERE
-       }
+      var suspendedUsers = _.filter(data, function(user){
+        return user.suspended === true;
+      });
 
-      }
+      console.log(suspendedUsers);
 
       this.switchTo('draw', {
         users: this.suspendedUsersObject
