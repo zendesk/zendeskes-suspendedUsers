@@ -1,14 +1,13 @@
-(function() {
+(function() { // This app doesn't scale to tens of thousands of users unless they have up several hours and won't close the browser window.
   return {
 
     users: [],
 
     requests: {
-      allUsers: function(page) {
+
+      url: function(url) {
         return {
-          url: helpers.fmt('/api/v2/users.json?page=%@', page),
-          type: 'GET',
-          contentType: 'application/json'
+          url: url
         };
       }
     },
@@ -20,7 +19,7 @@
 
     init: function() {
       this.switchTo('loading');
-      this.fetchAllUsers();
+      this.getAll('/api/v2/users.json', [], this.doWork);
     },
 
     buildList: function() { // Parse results of users in the account
@@ -39,65 +38,23 @@
 
     },
 
-    fetchAllUsers: function() {
-
-      return this.promise(
-        function(done, fail) {
-
-          this.users = [];
-
-          var fetchedUsers = this._paginate({
-            request: 'allUsers',
-            entity: 'users',
-            page: 1
-          });
-
-          fetchedUsers
-            .done(_.bind(
-              function(data) {
-                this.users = data;
-                this.buildList();
-                done();
-              }, this))
-            .fail(_.bind(function() {
-              services.notify(
-                "Something went wrong and we couldn't reach the REST API to retrieve all user data",
-                'error'); //side effect
-            }, this));
-        }
-      );
-
+    getAll: function(url, data, fn) {
+      if(data === null) {
+        data = [];
+      }
+      if(url === null) {
+      fn(data, this);
+      } else {
+      this.ajax('url', url).done(function(newdata){
+      data = data.concat(newdata.users);
+      this.getAll(newdata.next_page, data, fn);
+      });
+      }
     },
 
-    _paginate: function(a) { //this just paginates our list of users...utility function.
-      var results = [];
-      var initialRequest = this.ajax(a.request, a.page);
-      var allPages = initialRequest.then(function(data) {
-        results.push(data[a.entity]);
-        var nextPages = [];
-        var pageCount = Math.ceil(data.count / 100);
-        for (; pageCount > 1; --pageCount) {
-          nextPages.push(this.ajax(a.request, pageCount));
-        }
-        return this.when.apply(this, nextPages).then(function() {
-          var entities = _.chain(arguments)
-            .flatten()
-            .filter(function(item) {
-              return (_.isObject(item) && _.has(item, a.entity));
-            })
-            .map(function(item) {
-              return item[a.entity];
-            })
-            .value();
-          results.push(entities);
-        }).then(function() {
-          return _.chain(results)
-            .flatten()
-            .compact()
-            .value();
-        });
-      });
-      return allPages;
+    doWork: function(data, that) {
+      that.users = data;
+      that.buildList();
     }
 
   };
