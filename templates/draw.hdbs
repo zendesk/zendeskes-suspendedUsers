@@ -1,0 +1,1 @@
+<a href="data:text/csv;charset=utf-8,ID%2CNAME%2CEMAIL%0A{{#users}}{{id}}%2C{{name}}%2C{{email}}%0A{{/users}}" download="suspended_users.csv" class="btn"><i class="icon-download"></i>Download CSV</a>
