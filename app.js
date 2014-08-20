@@ -4,15 +4,16 @@
     users: [],
 
     requests: {
-
-      url: function(url) {
-        return {
-          url: url
-        };
-      },
-      proxy: function(request) {
+         allUsers: function(page) {
+            return {
+                url: helpers.fmt('/api/v2/users.json?page=%@', page),
+                type: 'GET',
+                contentType: 'application/json'
+            };
+        },
+        proxy: function(request) {
           return request;
-      }
+        }
 
     },
 
@@ -23,14 +24,10 @@
 
     init: function() {
       this.switchTo('loading');
-<<<<<<< Updated upstream
-      this.getAll('/api/v2/users.json', [], this.doWork);
-=======
-      this.get_all('allUsers', 10, function(data, context) {
+      this.get_all('allUsers', 100, function(data, context) {
         context.users = context.flatten(data, 'users');
         context.buildList();
       });
->>>>>>> Stashed changes
     },
 
     buildList: function() { // Parse results of users in the account
@@ -49,25 +46,6 @@
 
     },
 
-<<<<<<< Updated upstream
-    getAll: function(url, data, fn) {
-      if(data === null) {
-        data = [];
-      }
-      if(url === null) {
-      fn(data, this);
-      } else {
-      this.ajax('url', url).done(function(newdata){
-      data = data.concat(newdata.users);
-      this.getAll(newdata.next_page, data, fn);
-      });
-      }
-    },
-
-    doWork: function(data, that) {
-      that.users = data;
-      that.buildList();
-=======
     get_all: function(endpoint, workers, finished) {
         this.ajax(endpoint, 1).done(function(data) {
             this.workerCount = workers;
@@ -114,7 +92,6 @@
             data = data.concat(page[item]);
         });
         return data;
->>>>>>> Stashed changes
     }
 
   };
